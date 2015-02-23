@@ -45,7 +45,6 @@ def render_stdin():
 	if len(data_points) > 1:
 		pyplot.legend(loc="lower right")
 
-	normalize = True
 	while line:
 		line = sys.stdin.readline()
 		times.append(time.time() - startTime)
@@ -53,20 +52,25 @@ def render_stdin():
 		for key, val in parse_json(line).items():
 			data_points[key]["values"].append(val)
 
-		for graph in data_points.values():
-			if normalize:
-				max_value = float(max(map(abs, graph["values"])) or 1)
-				values = [val / max_value for val in graph["values"]]
-			else:
-				values = graph["values"]
-			graph["graph"].set_data(times, values)
+		render_data_points(times, data_points)
 
-		axes = pyplot.gca()
-		axes.relim()
-		axes.autoscale_view()
 
-		pyplot.pause(0.01)
-		pyplot.draw()
+def render_data_points(times, data_points):
+	normalize = True
+	for graph in data_points.values():
+		if normalize:
+			max_value = float(max(map(abs, graph["values"])) or 1)
+			values = [val / max_value for val in graph["values"]]
+		else:
+			values = graph["values"]
+		graph["graph"].set_data(times, values)
+
+	axes = pyplot.gca()
+	axes.relim()
+	axes.autoscale_view()
+
+	pyplot.pause(0.01)
+	pyplot.draw()
 
 if __name__ == "__main__":
 	configure_pyplot()
