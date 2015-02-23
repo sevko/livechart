@@ -3,11 +3,6 @@ import sys
 import json
 import time
 
-# for i in range(9):
-	# pyplot.subplot(3, 1, i)
-
-# pyplot.show()
-
 def parse_json(string):
 	try:
 		json_blob = json.loads(string)
@@ -30,20 +25,20 @@ def configure_pyplot():
 	pyplot.ion()
 	pyplot.xlabel("time (seconds)")
 
-def render_stdin():
+def render_stdin(config):
 	startTime = time.time()
 	times = [0]
 
 	data_points = {}
 	line = sys.stdin.readline()
 
-	num_horizontal = 2
-	num_vertical = 2
-	subplots = False
-
 	for id_, (key, val) in enumerate(parse_json(line).items(), start=1):
-		if subplots:
-			pyplot.subplot(num_vertical, num_horizontal, id_)
+		if config["subplots"]["show"]:
+			pyplot.subplot(
+				config["subplots"]["vertical"],
+				config["subplots"]["horizontal"],
+				id_
+			)
 			pyplot.title(key)
 
 		data_points[key] = {
@@ -51,7 +46,7 @@ def render_stdin():
 			"values": [val]
 		}
 
-	if not subplots and len(data_points) > 1:
+	if not config["subplots"]["show"] and len(data_points) > 1:
 		pyplot.legend(loc="lower right")
 
 	while line:
@@ -61,23 +56,24 @@ def render_stdin():
 		for key, val in parse_json(line).items():
 			data_points[key]["values"].append(val)
 
-		render_data_points(subplots, times, data_points)
+		render_data_points(times, data_points, config)
 
-def render_data_points(subplots, times, data_points):
-	num_horizontal = 2
-	num_vertical = 2
-
-	normalize = False
+def render_data_points(times, data_points, config):
 	pyplot.pause(0.01)
 	for id_, graph in enumerate(data_points.values(), start=1):
-		if subplots:
-			pyplot.subplot(num_vertical, num_horizontal, id_)
+		if config["subplots"]["show"]:
+			pyplot.subplot(
+				config["subplots"]["vertical"],
+				config["subplots"]["horizontal"],
+				id_
+			)
 
-		if normalize:
+		if config["normalize"]:
 			max_value = float(max(map(abs, graph["values"])) or 1)
 			values = [val / max_value for val in graph["values"]]
 		else:
 			values = graph["values"]
+
 		graph["graph"].set_data(times, values)
 
 		axes = pyplot.gca()
@@ -88,6 +84,13 @@ def render_data_points(subplots, times, data_points):
 
 if __name__ == "__main__":
 	configure_pyplot()
-	return_code = render_stdin()
+	return_code = render_stdin({
+		"normalize": True,
+		"subplots": {
+			"show": True,
+			"horizontal": 1,
+			"vertical": 3
+		}
+	})
 	if return_code is not None:
 		sys.exit(return_code)
