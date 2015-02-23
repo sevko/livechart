@@ -2,6 +2,7 @@ from matplotlib import pyplot
 import sys
 import json
 import time
+import math
 
 def parse_json(string):
 	try:
@@ -32,7 +33,14 @@ def render_stdin(config):
 	data_points = {}
 	line = sys.stdin.readline()
 
-	for id_, (key, val) in enumerate(parse_json(line).items(), start=1):
+	initial_data = parse_json(line).items()
+	sub_conf = config["subplots"]
+	if not ("vertical" in sub_conf and "horizontal" in sub_conf):
+		num_data_points = len(initial_data)
+		sub_conf["vertical"] = math.ceil(math.sqrt(num_data_points))
+		sub_conf["horizontal"] = math.ceil(num_data_points / sub_conf["vertical"])
+
+	for id_, (key, val) in enumerate(initial_data, start=1):
 		if config["subplots"]["show"]:
 			pyplot.subplot(
 				config["subplots"]["vertical"],
@@ -58,6 +66,10 @@ def render_stdin(config):
 
 		render_data_points(times, data_points, config)
 
+def normalize(values):
+	max_value = float(max(map(abs, values)) or 1)
+	return [val / max_value for val in values]
+
 def render_data_points(times, data_points, config):
 	pyplot.pause(0.01)
 	for id_, graph in enumerate(data_points.values(), start=1):
@@ -68,28 +80,22 @@ def render_data_points(times, data_points, config):
 				id_
 			)
 
-		if config["normalize"]:
-			max_value = float(max(map(abs, graph["values"])) or 1)
-			values = [val / max_value for val in graph["values"]]
-		else:
-			values = graph["values"]
-
-		graph["graph"].set_data(times, values)
+		y_values = normalize(graph["values"]) if config["normalize"] \
+			else graph["values"]
+		graph["graph"].set_data(times, y_values)
 
 		axes = pyplot.gca()
 		axes.relim()
 		axes.autoscale_view()
 
-		pyplot.draw()
+	pyplot.draw()
 
 if __name__ == "__main__":
 	configure_pyplot()
 	return_code = render_stdin({
 		"normalize": True,
 		"subplots": {
-			"show": True,
-			"horizontal": 1,
-			"vertical": 3
+			"show": True
 		}
 	})
 	if return_code is not None:
