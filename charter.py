@@ -40,6 +40,11 @@ def render_stdin(config):
 		sub_conf["vertical"] = math.ceil(math.sqrt(num_data_points))
 		sub_conf["horizontal"] = math.ceil(num_data_points / sub_conf["vertical"])
 
+	elif sub_conf["vertical"] * sub_conf["horizontal"] < len(initial_data):
+		print >> sys.stderr, \
+			"Provided number of subplots is less than the number of data points."
+		return 1
+
 	for id_, (key, val) in enumerate(initial_data, start=1):
 		if config["subplots"]["show"]:
 			pyplot.subplot(
