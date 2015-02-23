@@ -36,13 +36,22 @@ def render_stdin():
 
 	data_points = {}
 	line = sys.stdin.readline()
-	for key, val in parse_json(line).items():
+
+	num_horizontal = 2
+	num_vertical = 2
+	subplots = False
+
+	for id_, (key, val) in enumerate(parse_json(line).items(), start=1):
+		if subplots:
+			pyplot.subplot(num_vertical, num_horizontal, id_)
+			pyplot.title(key)
+
 		data_points[key] = {
 			"graph": pyplot.plot([val], [val], label=key)[0],
 			"values": [val]
 		}
 
-	if len(data_points) > 1:
+	if not subplots and len(data_points) > 1:
 		pyplot.legend(loc="lower right")
 
 	while line:
@@ -52,12 +61,18 @@ def render_stdin():
 		for key, val in parse_json(line).items():
 			data_points[key]["values"].append(val)
 
-		render_data_points(times, data_points)
+		render_data_points(subplots, times, data_points)
 
+def render_data_points(subplots, times, data_points):
+	num_horizontal = 2
+	num_vertical = 2
 
-def render_data_points(times, data_points):
-	normalize = True
-	for graph in data_points.values():
+	normalize = False
+	pyplot.pause(0.01)
+	for id_, graph in enumerate(data_points.values(), start=1):
+		if subplots:
+			pyplot.subplot(num_vertical, num_horizontal, id_)
+
 		if normalize:
 			max_value = float(max(map(abs, graph["values"])) or 1)
 			values = [val / max_value for val in graph["values"]]
@@ -65,12 +80,11 @@ def render_data_points(times, data_points):
 			values = graph["values"]
 		graph["graph"].set_data(times, values)
 
-	axes = pyplot.gca()
-	axes.relim()
-	axes.autoscale_view()
+		axes = pyplot.gca()
+		axes.relim()
+		axes.autoscale_view()
 
-	pyplot.pause(0.01)
-	pyplot.draw()
+		pyplot.draw()
 
 if __name__ == "__main__":
 	configure_pyplot()
