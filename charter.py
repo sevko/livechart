@@ -10,11 +10,21 @@ import time
 
 def parse_json(string):
 	try:
-		return json.loads(string)
+		json_blob = json.loads(string)
 
 	except ValueError as excep:
 		print >> sys.stderr, \
 			"{0}Failed to parse JSON for line: {1}".format(excep, string)
+
+	if isinstance(json_blob, (int, float)):
+		return {"value": json_blob}
+
+	elif isinstance(json_blob, dict):
+		return json_blob
+
+	else:
+		print >> sys.stderr, \
+			"Decoded JSON is not a chartable data-type: {}".format(json_blob)
 
 def configure_pyplot():
 	pyplot.ion()
