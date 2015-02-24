@@ -1,3 +1,8 @@
+"""
+Contains functions for reading data from stdin, parsing it, and plotting it on
+a `matplotlib` figure.
+"""
+
 from matplotlib import pyplot
 import sys
 import json
@@ -6,6 +11,11 @@ import math
 import warnings
 
 def parse_json(string):
+	"""
+	Attempt to parse an int, float, or dictionary from a JSON string. Return
+	None if parsing failed, and print an error.
+	"""
+
 	try:
 		json_blob = json.loads(string)
 
@@ -28,6 +38,12 @@ def configure_pyplot():
 	pyplot.xlabel("time (seconds)")
 
 def render_stdin(config):
+	"""
+	Continuously read in data from stdin, parse it using `parse_json()`, and
+	update the matplotlib plot with `render_data_points()`. Accepts a `config`
+	dictionary argument that contains all configuration options.
+	"""
+
 	startTime = time.time()
 	times = [0]
 
@@ -73,10 +89,18 @@ def render_stdin(config):
 		render_data_points(times, data_points, config)
 
 def normalize(values):
+	"""
+	Normalize a list of numeric values against the maximum absolute value.
+	"""
+
 	max_value = float(max(map(abs, values)) or 1)
 	return [val / max_value for val in values]
 
 def render_data_points(times, data_points, config):
+	"""
+	Update the matplotlib figure with new data.
+	"""
+
 	with warnings.catch_warnings():
 		warnings.simplefilter("ignore")
 		pyplot.pause(0.01)
@@ -98,14 +122,3 @@ def render_data_points(times, data_points, config):
 		axes.autoscale_view()
 
 	pyplot.draw()
-
-if __name__ == "__main__":
-	configure_pyplot()
-	return_code = render_stdin({
-		"normalize": True,
-		"subplots": {
-			"show": True
-		}
-	})
-	if return_code is not None:
-		sys.exit(return_code)
