@@ -1,6 +1,5 @@
 import argparse
-# import charter as livechart
-import livechart
+from livechart import chart
 
 def parse_args():
 	parser = argparse.ArgumentParser(description="Plot a graph of STDIN data, live.")
@@ -26,5 +25,6 @@ def parse_args():
 
 	return args
 
-livechart.configure_pyplot()
-livechart.render_stdin(parse_args())
+def run():
+	chart.configure_pyplot()
+	chart.render_stdin(parse_args())
