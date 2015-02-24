@@ -1,4 +1,6 @@
 import argparse
+import sys
+
 from livechart import chart
 
 def parse_args():
@@ -27,4 +29,7 @@ def parse_args():
 
 def run():
 	chart.configure_pyplot()
-	chart.render_stdin(parse_args())
+	try:
+		chart.render_stdin(parse_args())
+	except KeyboardInterrupt:
+		sys.exit(0)

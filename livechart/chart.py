@@ -3,6 +3,7 @@ import sys
 import json
 import time
 import math
+import warnings
 
 def parse_json(string):
 	try:
@@ -76,7 +77,10 @@ def normalize(values):
 	return [val / max_value for val in values]
 
 def render_data_points(times, data_points, config):
-	pyplot.pause(0.01)
+	with warnings.catch_warnings():
+		warnings.simplefilter("ignore")
+		pyplot.pause(0.01)
+
 	for id_, graph in enumerate(data_points.values(), start=1):
 		if config["subplots"]["show"]:
 			pyplot.subplot(
