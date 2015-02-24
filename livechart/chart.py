@@ -3,6 +3,7 @@ Contains functions for reading data from stdin, parsing it, and plotting it on
 a `matplotlib` figure.
 """
 
+from __future__ import print_function
 from matplotlib import pyplot
 import sys
 import json
@@ -20,8 +21,10 @@ def parse_json(string):
 		json_blob = json.loads(string)
 
 	except ValueError as excep:
-		print >> sys.stderr, \
-			"{0}Failed to parse JSON for line: {1}".format(excep, string)
+		print(
+			"{0}Failed to parse JSON for line: {1}".format(excep, string),
+			file=sys.stderr
+		)
 
 	if isinstance(json_blob, (int, float)):
 		return {"value": json_blob}
@@ -30,8 +33,10 @@ def parse_json(string):
 		return json_blob
 
 	else:
-		print >> sys.stderr, \
-			"Decoded JSON is not a chartable data-type: {}".format(json_blob)
+		print(
+			"Decoded JSON is not a chartable data-type: {}".format(json_blob),
+			file=sys.stderr
+		)
 
 def configure_pyplot():
 	pyplot.ion()
@@ -44,7 +49,7 @@ def render_stdin(config):
 	dictionary argument that contains all configuration options.
 	"""
 
-	startTime = time.time()
+	start_time = time.time()
 	times = [0]
 
 	data_points = {}
@@ -58,8 +63,10 @@ def render_stdin(config):
 		sub_conf["horizontal"] = math.ceil(num_data_points / sub_conf["vertical"])
 
 	elif sub_conf["vertical"] * sub_conf["horizontal"] < len(initial_data):
-		print >> sys.stderr, \
-			"Provided number of subplots is less than the number of data points."
+		print(
+			"Number of subplots is less than the number of data points.",
+			file=sys.stderr
+		)
 		return 1
 
 	for id_, (key, val) in enumerate(initial_data, start=1):
@@ -81,7 +88,7 @@ def render_stdin(config):
 
 	while line:
 		line = sys.stdin.readline()
-		times.append(time.time() - startTime)
+		times.append(time.time() - start_time)
 
 		for key, val in parse_json(line).items():
 			data_points[key]["values"].append(val)
