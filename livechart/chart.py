@@ -38,9 +38,15 @@ def parse_json(string):
 			file=sys.stderr
 		)
 
+def handle_close(evt):
+	sys.exit(0)
+
 def configure_pyplot():
 	pyplot.ion()
 	pyplot.xlabel("time (seconds)")
+	canvas = pyplot.gcf().canvas
+	canvas.set_window_title("livechart")
+	canvas.mpl_connect("close_event", handle_close)
 
 def render_stdin(config):
 	"""
