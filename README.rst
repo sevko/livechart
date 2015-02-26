@@ -1,4 +1,4 @@
-live-chart
+livechart
 ==========
 
 A command-line utility for rendering quick-and-dirty graphs of STDIN input.
