@@ -11,7 +11,7 @@ setuptools.setup(
 	name="livechart",
 	description="A CLI utility for charting data on the fly.",
 	long_description=long_description,
-	version="0.0.2",
+	version="0.0.4",
 	url="https://github.com/sevko/livechart",
 	author="Severyn Kozak",
 	author_email="severyn.kozak@gmail.com",
