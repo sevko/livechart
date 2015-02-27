@@ -91,9 +91,8 @@ def render_stdin(config):
 		pyplot.legend(loc="lower right")
 
 	prevRenderTime = time.time()
+	line = sys.stdin.readline()
 	while line:
-		line = sys.stdin.readline()
-
 		new_data = parse_json(line.rstrip("\n"))
 		if new_data is not None:
 			times.append(time.time() - start_time)
@@ -114,6 +113,9 @@ def render_stdin(config):
 				render_data_points(times, data_points, config)
 				prevRenderTime = currTime
 
+		line = sys.stdin.readline()
+
+	render_data_points(times, data_points, config)
 	pyplot.show(block=True)
 
 def normalize(values):
