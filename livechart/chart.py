@@ -59,7 +59,12 @@ def render_stdin(config):
 
 	data_points = {}
 	line = sys.stdin.readline().rstrip("\n")
-	initial_data = parse_json(line).items()
+	initial_data = parse_json(line)
+	if initial_data is None:
+		print("No valid data detected in first line of STDIN.", file=sys.stderr)
+		return 1
+
+	initial_data = initial_data.items()
 	sub_conf = config["subplots"]
 	if not ("vertical" in sub_conf and "horizontal" in sub_conf):
 		num_data_points = len(initial_data)
