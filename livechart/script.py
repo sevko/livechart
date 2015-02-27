@@ -3,6 +3,7 @@ Contains functions for parsing command-line arguments and initializing the
 tool. Intended to serve as the command-line entry point.
 """
 
+from __future__ import print_function
 import argparse
 import sys
 
@@ -68,6 +69,13 @@ def run():
 	"""
 	Runs the tool.
 	"""
+
+	if sys.stdin.isatty():
+		print(
+			"No STDIN input detected. `livechart --help` for help information.",
+			file=sys.stderr
+		)
+		sys.exit(1)
 
 	chart.configure_pyplot()
 	try:
