@@ -110,6 +110,8 @@ def render_stdin(config):
 
 			render_data_points(times, data_points, config)
 
+	pyplot.show(block=True)
+
 def normalize(values):
 	"""
 	Normalize a list of numeric values against the maximum absolute value.
