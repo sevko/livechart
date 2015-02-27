@@ -63,6 +63,6 @@ def run():
 
 	chart.configure_pyplot()
 	try:
-		sys.exit(chart.render_stdin(parse_args()))
+		chart.render_stdin(parse_args())
 	except KeyboardInterrupt:
 		pass

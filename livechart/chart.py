@@ -21,10 +21,9 @@ def parse_json(string):
 		json_blob = json.loads(string)
 
 	except ValueError as excep:
-		print(
-			"{0}Failed to parse JSON for line: {1}".format(excep, string),
-			file=sys.stderr
-		)
+		msg = "Failed to parse line `{0}` with `{1}` exception."
+		print(msg.format(string, excep), file=sys.stderr)
+		return
 
 	if isinstance(json_blob, (int, float)):
 		return {"value": json_blob}
@@ -59,8 +58,7 @@ def render_stdin(config):
 	times = [0]
 
 	data_points = {}
-	line = sys.stdin.readline()
-
+	line = sys.stdin.readline().rstrip("\n")
 	initial_data = parse_json(line).items()
 	sub_conf = config["subplots"]
 	if not ("vertical" in sub_conf and "horizontal" in sub_conf):
@@ -94,12 +92,23 @@ def render_stdin(config):
 
 	while line:
 		line = sys.stdin.readline()
-		times.append(time.time() - start_time)
 
-		for key, val in parse_json(line).items():
-			data_points[key]["values"].append(val)
+		new_data = parse_json(line.rstrip("\n"))
+		if new_data is not None:
+			times.append(time.time() - start_time)
+			for key, val in new_data.items():
+				try:
+					data_points[key]["values"].append(val)
+				except KeyError as e:
+					msg = (
+						"Key `{}` not found. The data you pipe into livechart"
+						" must be consistent (ie, only numbers or JSON"
+						" dictionaries)"
+					)
+					print(msg, file=sys.stderr)
+					return 1
 
-		render_data_points(times, data_points, config)
+			render_data_points(times, data_points, config)
 
 def normalize(values):
 	"""
