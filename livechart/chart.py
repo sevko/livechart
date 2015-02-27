@@ -90,6 +90,7 @@ def render_stdin(config):
 	if not config["subplots"]["show"] and len(data_points) > 1:
 		pyplot.legend(loc="lower right")
 
+	prevRenderTime = time.time()
 	while line:
 		line = sys.stdin.readline()
 
@@ -108,7 +109,10 @@ def render_stdin(config):
 					print(msg, file=sys.stderr)
 					return 1
 
-			render_data_points(times, data_points, config)
+			currTime = time.time()
+			if currTime - prevRenderTime >= config["render_interval"]:
+				render_data_points(times, data_points, config)
+				prevRenderTime = currTime
 
 	pyplot.show(block=True)
 
@@ -141,8 +145,7 @@ def render_data_points(times, data_points, config):
 			else graph["values"]
 		graph["graph"].set_data(times, y_values)
 
-		axes = pyplot.gca()
-		axes.relim()
-		axes.autoscale_view()
-
+	axes = pyplot.gca()
+	axes.relim()
+	axes.autoscale_view()
 	pyplot.draw()

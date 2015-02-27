@@ -19,7 +19,10 @@ def parse_args():
 		"JSON-serialized dictionaries/objects or numbers. If objects are "
 		"received, each top-level key is expected to be mapped to a number."
 	)
-	parser = argparse.ArgumentParser(description=description)
+	parser = argparse.ArgumentParser(
+		description=description,
+		formatter_class=argparse.ArgumentDefaultsHelpFormatter
+	)
 	parser.add_argument(
 		"-s", "--subplots", default=False, const=True, nargs="?", type=str,
 		help=(
@@ -35,6 +38,11 @@ def parse_args():
 			"points with vastly different ranges are getting plotted on the "
 			"same graph."
 		)
+	)
+
+	parser.add_argument(
+		"-i", "--interval", type=float, default=1.0, dest="render_interval",
+		help="The second interval at which to re-render the graph."
 	)
 
 	args = vars(parser.parse_args())
