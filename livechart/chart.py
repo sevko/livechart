@@ -120,7 +120,8 @@ def render_stdin(config):
 					print(msg, file=sys.stderr)
 					return 1
 
-			if curr_time - prevRenderTime >= config["render_interval"]:
+			if not config["no_refresh"] and \
+				curr_time - prevRenderTime >= config["render_interval"]:
 				render_data_points(times, data_points, config)
 				time_spent_rendering += time.time() - curr_time
 				prevRenderTime = curr_time

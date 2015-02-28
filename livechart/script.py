@@ -46,6 +46,14 @@ def parse_args():
 		help="The second interval at which to re-render the graph."
 	)
 
+	parser.add_argument(
+		"-N", "--no-refresh", action="store_true",
+		help=(
+			"Whether to refresh the graph while ingesting data, which might "
+			"not make sense for bulk loads."
+		)
+	)
+
 	args = vars(parser.parse_args())
 	if not args["subplots"]:
 		args["subplots"] = {
