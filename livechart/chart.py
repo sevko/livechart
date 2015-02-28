@@ -97,10 +97,17 @@ def render_stdin(config):
 
 	prevRenderTime = time.time()
 	line = sys.stdin.readline()
+
+	# Track the time spent rendering, to subtract it from the new times plotted
+	# on the x-axis and thus avoid artefacts (flat parts of the graph) caused
+	# by it.
+	time_spent_rendering = 0
+
 	while line:
 		new_data = parse_json(line.rstrip("\n"))
 		if new_data is not None:
-			times.append(time.time() - start_time)
+			curr_time = time.time()
+			times.append(curr_time - start_time - time_spent_rendering)
 			for key, val in new_data.items():
 				try:
 					data_points[key]["values"].append(val)
@@ -113,10 +120,10 @@ def render_stdin(config):
 					print(msg, file=sys.stderr)
 					return 1
 
-			currTime = time.time()
-			if currTime - prevRenderTime >= config["render_interval"]:
+			if curr_time - prevRenderTime >= config["render_interval"]:
 				render_data_points(times, data_points, config)
-				prevRenderTime = currTime
+				time_spent_rendering += time.time() - curr_time
+				prevRenderTime = curr_time
 
 		line = sys.stdin.readline()
 
